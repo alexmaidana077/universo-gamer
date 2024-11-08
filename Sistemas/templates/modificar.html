@@ -1,0 +1,16 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block conte %}
+<div class="contenedor_modificar">
+    <img src="{% static 'img/Formulario/modificar.jpg' %}" alt="">
+    <form action="" method="post" enctype="multipart/form-data">
+        <!-- PR desde Views -->
+        {{forms}}
+        {% csrf_token %}
+        <!-- Botón para Consulta -->
+        <input type="submit" value="Modificar" class="btn btn-outline-primary">
+        <p class="mensaje">{{ruben}}</p>
+    </form>
+</div>
+{% endblock %}

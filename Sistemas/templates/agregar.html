@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block conte %}
+{% if messages %}
+{% for message in messages %}
+<div class="{% if message.tags == 'success' %}mensaje-exito{% elif message.tags == 'error' %}mensaje-error{% elif message.tags == 'warning' %}mensaje-advertencia{% elif message.tags == 'info' %}mensaje-info{% endif %}"
+    id="mensaje-centrado">
+    {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+    {% if message.tags == 'error' %}<i class="fas fa-times-circle"></i>{% endif %}
+    {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+    {% if message.tags == 'info' %}<i class="fas fa-info-circle"></i>{% endif %}
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endif %}
+<div class="contenedor_agregar">
+    <img src="{% static 'img/Formulario/agregar.jpg' %}" alt="">
+    <form action="" method="post" enctype="multipart/form-data">
+
+        <h4>Cargue el producto</h4>
+        {% csrf_token %}
+        {{forms}}
+        <input type="submit" class="btn btn-outline-light" value="Registrar">
+        <p class="mensaje">{{ruben}}</p>
+    </form>
+</div>
+
+
+
+
+{% endblock %}

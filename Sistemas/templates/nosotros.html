@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block conte %}
+<div class="presentacion">
+    <div class="presentacion-img">
+        <img src="{% static 'img/log2.png' %}" alt="">
+    </div>
+    
+    <div class="texto">
+        <h1>¡Bienvenido a Universo Gamer!</h1>
+
+        <p>Tu destino definitivo para cómics, figuras de colección, juegos y todo lo que te apasiona del universo gamer.
+        </p>
+        <p>Explora nuestro catálogo de productos cuidadosamente seleccionados y déjate sorprender por las últimas
+            novedades, ediciones limitadas y artículos exclusivos.</p>
+        <p>Ya seas fan de los superhéroes, los videojuegos o los clásicos de la ciencia ficción, aquí encontrarás algo
+            que te hará sentir en casa. ¡Comienza tu aventura con nosotros!</p>
+
+        <a href="">
+            <div class="insta">
+                <img src="{% static 'img/footer/instagram.png' %}">
+                <span>@Universo_Gamer777</span>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

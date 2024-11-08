@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block conte %}
+<div class="contenedor_login">
+    <img src="{% static 'img/log2.png' %}" alt="">
+    <form action="" method="post">
+        <h1>Login</h1>
+        {% csrf_token %}
+        {{form}}
+        <input type="submit" value="Login" class="btn btn-outline-light">
+        <a href="{% url 'registro' %}">¿No tienes cuenta?<span> Registrate</span></a>
+    </form>
+</div>
+{% endblock %}

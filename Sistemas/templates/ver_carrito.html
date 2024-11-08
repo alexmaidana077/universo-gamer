@@ -1,0 +1,26 @@
+
+
+<h2>Carrito de Compras</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Imagen</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+        </tr>
+    </thead>
+    <body>
+        {% for item in carrito %}
+        <tr>
+            <td>{{ item.producto.Nombre }}</td>
+            <td><img src="{{ item.producto.Imagen.url }}" alt="{{ item.producto.Nombre }}" style="width: 100px; height: auto;"></td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.producto.Precio|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total: ${{ total|floatformat:2 }}</h3>

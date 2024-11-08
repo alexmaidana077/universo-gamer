@@ -1,0 +1,19 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block conte %}
+<div class="contenedor_perfil">
+    <h1>@{{user.username}}</h1>
+    <h3>Email: {{user.email}}</h3>
+    <h3>permisos:</h3>
+    <div class="overflow-auto" style="height: 150px;" id="scroll-perfil">
+        <ul id="scrollspyHeading1">
+            {% for perm in user_permissions %}
+            <li>{{ perm }}</li>
+            {% empty %}
+            <li>No tienes permisos asignados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <a href="{% url 'logouts' %}" class="btn btn-outline-danger">Cerrar sesión</a>
+</div>
+{% endblock %}

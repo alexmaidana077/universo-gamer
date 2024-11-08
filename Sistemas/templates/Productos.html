@@ -1,0 +1,150 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block conte %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="{% if message.tags == 'success' %}mensaje-exito{% elif message.tags == 'error' %}mensaje-error{% elif message.tags == 'warning' %}mensaje-advertencia{% elif message.tags == 'info' %}mensaje-info{% endif %}"
+    id="mensaje-centrado">
+    {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+    {% if message.tags == 'error' %}<i class="fas fa-times-circle"></i>{% endif %}
+    {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+    {% if message.tags == 'info' %}<i class="fas fa-info-circle"></i>{% endif %}
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endif %}
+
+
+
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        Filtro
+    </button>
+    <ul class="dropdown-menu">
+        <li><button class="dropdown-item" type="submit" name="filtro">Figuras</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro">Cartas</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro">Juegos</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro">Comics</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro">Decoracion</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro">Indumentaria</button></li>
+        <li><button class="dropdown-item" type="submit" name="filtro" value=" ">Todo</button></li>
+    </ul>
+</div>
+
+{% if productos_stock_bajo %}
+<div class="alert alert-warning" role="alert">
+    <strong>Alerta de stock bajo:</strong>
+    <ul>
+        {% for producto in productos_stock_bajo %}
+        <li>El producto "{{ producto.Nombre }}" tiene solo {{ producto.Cantidad }} unidades en stock.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+
+<div class="contenedor_visualizar">
+    {% for i in products %}
+    <div class="card mb-3" id="cardd">
+        <div class="row g-0" id="roww">
+            <div class="col-md-4">
+                <img src="{{i.Imagen.url}}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title" name="filtro">{{i.Nombre}}</h5>
+
+                    <p class="card-text">{{i.MicroDescripcion}}</p>
+                    <h6>$ {{i.Precio}}</h6>
+                    <div class="button-container">
+                        <a href="#" class="btn btn-outline-info" id="aa">Añadir al carrito</a>
+                        <a href="{% url 'producto' i.Codigo %}" class="btn btn-outline-light">Mas info</a>
+                        {% if perms.Sistemas.change_productos %}
+                        <a href="{% url 'modificar' i.Codigo %}" class="btn btn-outline-light">Editar</a>
+                        {% endif %}
+                        {% if perms.Sistemas.delete_productos %}
+                        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar{{ i.Codigo }}">Eliminar</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalEliminar{{ i.Codigo }}" tabindex="-1"
+        aria-labelledby="modalEliminarLabel{{ i.Codigo }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarLabel{{ i.Codigo }}">¿Desea eliminar el producto?</h5>
+                    <i class="bi bi-trash3-fill"></i>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de querer eliminar "{{ i.Nombre }}" de la lista de productos? Una vez completada la
+                    acción no podrá revertirse.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                    <a href="{% url 'eliminar' i.Codigo %}" class="btn btn-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<!-- Barra de paginación -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if products.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        {% endif %}
+
+        {% for num in products.paginator.page_range %}
+        {% if products.number == num %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %} <li class="page-item"><a
+                class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;&raquo;</span>
+            </li>
+            {% endif %}
+    </ul>
+</nav>
+{% endblock %}
