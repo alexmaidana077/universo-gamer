@@ -99,8 +99,8 @@ def permisos(request):
     return render(request, 'permisos.html',data)
 
 def Stock(request):
-        productos = Productos.objects.all()  # Obtener todos los productos
-        productos_stock_bajo = productos.filter(Cantidad__lt= 10)  # Filtrar productos con stock menor a 10
+        productos = Productos.objects.all() 
+        productos_stock_bajo = productos.filter(Cantidad__lt= 10) 
 
         return render(request, 'productos.html', {
             'productos': productos,
@@ -152,7 +152,6 @@ def ver_carrito(request):
     carrito, created = Carrito.objects.get_or_create(user=request.user)
     carrito_items = CarritoItem.objects.filter(carrito=carrito)
     
-    # Calcular el total del carrito y los subtotales de cada item
     total = sum(item.total_precio() for item in carrito_items)
     
     context = {
@@ -166,7 +165,6 @@ def ver_carrito(request):
 def agregar_al_carrito(request, Codigo):
     producto = get_object_or_404(Productos, Codigo=Codigo)
     
-    # Verifica si hay suficiente stock
     if producto.Cantidad > 0:
         carrito, created = Carrito.objects.get_or_create(user=request.user)
         carrito_item, item_created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto)
@@ -175,7 +173,6 @@ def agregar_al_carrito(request, Codigo):
             carrito_item.cantidad += 1
         carrito_item.save()
         
-        # Disminuir el stock del producto en 1
         producto.Cantidad -= 1
         producto.save()
         
