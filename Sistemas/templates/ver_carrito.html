@@ -1,26 +1,65 @@
+{% extends 'index.html' %}
+{% load static %}
 
+{% block conte %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="{% if message.tags == 'success' %}mensaje-exito{% elif message.tags == 'error' %}mensaje-error{% elif message.tags == 'warning' %}mensaje-advertencia{% elif message.tags == 'info' %}mensaje-info{% endif %}"
+    id="mensaje-centrado">
+    {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+    {% if message.tags == 'error' %}<i class="fas fa-times-circle"></i>{% endif %}
+    {% if message.tags == 'info' %}<i class="fas fa-info-circle"></i>{% endif %}
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endif %}
 
 <h2>Carrito de Compras</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Imagen</th>
-            <th>Cantidad</th>
-            <th>Precio Unitario</th>
-        </tr>
-    </thead>
-    <body>
-        {% for item in carrito %}
-        <tr>
-            <td>{{ item.producto.Nombre }}</td>
-            <td><img src="{{ item.producto.Imagen.url }}" alt="{{ item.producto.Nombre }}" style="width: 100px; height: auto;"></td>
-            <td>{{ item.cantidad }}</td>
-            <td>${{ item.producto.Precio|floatformat:2 }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="contenedor_carrito">
+    <table>
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
 
-<h3>Total: ${{ total|floatformat:2 }}</h3>
+        <tbody>
+            {% if carrito %}
+            
+                {% for item in carrito %}
+                <tr>
+                    <td id="imagen"><img src="{{ item.producto.Imagen.url }}" alt="{{ item.producto.Nombre }}"></td>
+                    <td>{{ item.producto.Nombre }}</td>
+                    <td><a href="{% url 'menos_del_carrito' Codigo=item.producto.Codigo %}" class="btn btn-outline-light"><i class="bi bi-arrow-left-circle"></i></a>{{ item.cantidad }} <a href="{% url 'mas_del_carrito' Codigo=item.producto.Codigo %}" class="btn btn-outline-light"><i class="bi bi-arrow-right-circle"></i></a></td>
+                    <td>${{ item.producto.Precio|floatformat:2 }}</td>
+                    <td><a href="{% url 'eliminar_del_carrito' Codigo=item.producto.Codigo %}" class="btn btn-outline-danger"><i class="bi bi-trash3"></i></a></td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" style="padding: 10px;">
+                        <h1>no hay productos</h1>
+                        <h2>El carrito se encuentra vacio</h2>
+                    </td>
+                </tr>
+            {% endif%}
+        </tbody>
+
+    </table>
+</div>
+{% if carrito %}
+<div class="total_carrito">
+    <h3>Total: ${{ total|floatformat:2 }}</h3>
+    <div class="btn-carrito">
+        <a href="{% url 'eliminar_carrito' %}" class="btn btn-outline-danger">Borrar Carrito</a>
+        <a href="{% url 'boleta' %}" class="btn btn-outline-primary">Pagar</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

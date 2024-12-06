@@ -3,12 +3,15 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 #--->Importamos el Formulario
 from .formularios import *
 from .models import *
-
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from django.contrib.auth import logout, login, authenticate
-
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.contrib import messages
+
+from django.utils.timezone import now
 # Create your views here.
 def Home(request):
     buscar=Productos.objects.all().order_by('-Codigo')[:4]
@@ -21,20 +24,18 @@ def Ver_Producto(request):
     # Obtener todos los productos
     productos = Productos.objects.all()
 
-    # Configura el número de productos por página
-    paginator = Paginator(productos, 5)  # Cambia '5' por el número de productos que quieras por página
+    # Filtrar productos con stock bajo
+    productos_bajo_stock = productos.filter(Cantidad__lt=15)
+    nombres_bajo_stock = productos_bajo_stock.values_list('Nombre', flat=True) 
 
-    # Obtener el número de página desde la URL
+    paginator = Paginator(productos, 5)
     page = request.GET.get('page')
 
     try:
-        # Obtener los productos de la página solicitada
         productos_pagina = paginator.page(page)
     except PageNotAnInteger:
-        # Si la página no es un número entero, mostramos la primera página
         productos_pagina = paginator.page(1)
     except EmptyPage:
-        # Si la página está fuera de rango, mostramos la última página
         productos_pagina = paginator.page(paginator.num_pages)
 
     # Pasar los productos paginados al contexto
@@ -42,14 +43,24 @@ def Ver_Producto(request):
         'products': productos_pagina
     }
 
+    # Crear el mensaje de advertencia si hay productos con stock bajo
+    if productos_bajo_stock.exists():
+        nombres_lista = ', '.join(nombres_bajo_stock) # se separa la lista de nombres apartir de las comas
+        messages.warning(
+            request,
+            f"Los siguientes productos tienen stock bajo: {nombres_lista}. Revisa los detalles."
+            #se utiliza la f como una forma de cadena de formateo para los nombres de cada producto 
+        )
+
     return render(request, 'Productos.html', data)
 
+
 def producto(request,Codigo):
- buscar=Productos.objects.filter(Codigo=Codigo)
- data={
-        'mas':buscar
-    }
- return render(request,'producto.html',data)
+    buscar=Productos.objects.filter(Codigo=Codigo)
+    data={
+            'mas':buscar
+        }
+    return render(request,'producto.html',data)
 
 def Nosotros(request):
     return render(request, 'nosotros.html')
@@ -78,6 +89,7 @@ def register(request):
 
 def perfil(request):
     user_permissions = request.user.get_all_permissions()
+
     return render(request,'perfil.html', {'user_permissions': user_permissions})
 
 def permisos(request):
@@ -97,15 +109,6 @@ def permisos(request):
             data['forms']=query
         
     return render(request, 'permisos.html',data)
-
-def Stock(request):
-        productos = Productos.objects.all() 
-        productos_stock_bajo = productos.filter(Cantidad__lt= 10) 
-
-        return render(request, 'productos.html', {
-            'productos': productos,
-            'productos_stock_bajo': productos_stock_bajo
-        })
 
 @permission_required('Sistemas.add_Productos')
 def Agregar(request):
@@ -161,6 +164,8 @@ def ver_carrito(request):
     return render(request, 'ver_carrito.html', context)
 
 
+from django.shortcuts import redirect
+
 @login_required
 def agregar_al_carrito(request, Codigo):
     producto = get_object_or_404(Productos, Codigo=Codigo)
@@ -180,12 +185,117 @@ def agregar_al_carrito(request, Codigo):
     else:
         messages.error(request, "Este producto está agotado.")
     
-    return redirect('ver_carrito')
+    return redirect('productos')
+
+
+@login_required
+def Boleta(request):
+    # Obtener el carrito del usuario
+    carrito = CarritoItem.objects.filter(carrito__user=request.user)
+    total = sum(item.total_precio() for item in carrito)
+
+    # Datos del contexto
+    context = {
+        'user': request.user,
+        'carrito': carrito,
+        'total': total,
+        'fecha_hora': now(),
+    }
+
+    # Cargar plantilla
+    template = get_template('boleta.html')
+    html = template.render(context)
+
+    # Configurar respuesta HTTP para PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="boleta_{request.user.username}.pdf"'
+
+    # Generar PDF con xhtml2pdf
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # Verificar errores
+    if pisa_status.err:
+        return HttpResponse(f"Error al generar PDF: {pisa_status.err}", content_type="text/plain")
+
+    return response
 
 @login_required
 def eliminar_del_carrito(request, Codigo):
     carrito = get_object_or_404(Carrito, user=request.user)
     carrito_item = get_object_or_404(CarritoItem, carrito=carrito, producto__Codigo=Codigo)
+
+    producto = carrito_item.producto
+
+    producto.Cantidad += carrito_item.cantidad
+    producto.save()
+
     carrito_item.delete()
+    
+    messages.error(request, "Producto eliminado del carrito.")
+    
     return redirect('ver_carrito')
 
+@login_required
+def menos_del_carrito(request, Codigo):
+    # Obtiene el carrito del usuario
+    carrito = get_object_or_404(Carrito, user=request.user)
+    # Busca el ítem en el carrito correspondiente al producto
+    carrito_item = get_object_or_404(CarritoItem, carrito=carrito, producto__Codigo=Codigo)
+
+    # Reduce la cantidad del producto en el carrito
+    if carrito_item.cantidad > 1:
+        carrito_item.cantidad -= 1
+        carrito_item.save()
+
+        # Aumenta la cantidad disponible del producto
+        producto = carrito_item.producto
+        producto.Cantidad += 1
+        producto.save()
+
+        messages.info(request, "Cantidad del producto reducida en el carrito.")
+    else:
+        # Si la cantidad es 1, elimina el ítem del carrito
+        carrito_item.delete()
+        messages.warning(request, "Producto eliminado del carrito.")
+
+    return redirect('ver_carrito')
+
+@login_required
+def mas_del_carrito(request, Codigo):
+    producto = get_object_or_404(Productos, Codigo=Codigo)
+
+    if producto.Cantidad > 0:  # Verifica si hay suficiente stock
+        # mantiene el carrito del usuario y modifica el de el
+        carrito, created = Carrito.objects.get_or_create(user=request.user)
+        # Obtiene o crea el ítem correspondiente al producto
+        carrito_item, item_created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto)
+        
+        # Incrementa la cantidad del ítem en el carrito
+        carrito_item.cantidad += 1
+        carrito_item.save()
+
+        # Reduce la cantidad disponible del producto
+        producto.Cantidad -= 1
+        producto.save()
+
+        messages.success(request, "Cantidad del producto aumentada en el carrito.")
+    else:
+        messages.error(request, "No hay suficiente stock para añadir más de este producto.")
+
+    return redirect('ver_carrito')
+
+@login_required
+def Eliminar_carrito(request):
+    carrito = get_object_or_404(Carrito, user=request.user)
+
+    carrito_items = CarritoItem.objects.filter(carrito=carrito)
+
+    for item in carrito_items:
+        producto = item.producto
+        producto.Cantidad += item.cantidad
+        producto.save()
+
+    carrito_items.delete()
+    
+    messages.error(request, "Todos los productos han sido eliminados del carrito.")
+    return redirect('ver_carrito')

@@ -967,7 +967,7 @@ h2 {
     background: rgb(0, 5, 59);
     background: linear-gradient(135deg, rgba(0, 5, 59, 1) 0%, rgba(2, 40, 87, 1) 50%, rgba(0, 54, 115, 1) 100%);
     width: 50%;
-    height: 300px;
+    min-height: 300px;
     padding: 10px;
     color: #ffffff;
     border-radius: 10px;
@@ -1174,6 +1174,82 @@ h2 {
     transition: 0.3s;
 }
 
+/*------------carrito---------------*/
+
+.contenedor_carrito{
+    margin: 20px auto;
+    padding-right: 10px;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    border-radius: 20px;
+}
+
+.contenedor_carrito table {
+    margin: auto 10px;
+    text-align: center;
+    background-color: #000000;
+    width: 100%;
+    font-weight: normal;
+}
+
+.contenedor_carrito table thead {
+    width: 100%;
+    background-color: #14046b;
+    border: #000000 solid 1px;
+}
+
+.contenedor_carrito table thead th {
+    border: #000000 solid 1px;
+    font-family: "Righteous", sans-serif;
+    font-weight: lighter;
+}
+
+.contenedor_carrito table tbody{
+    width: 100%;
+}
+
+.contenedor_carrito table tbody tr{
+    height: 50px;
+}
+
+.contenedor_carrito table tbody th, table tbody td {
+    border: #00054e solid 1px;
+}
+
+.contenedor_carrito table tbody tr td a {
+    margin: 10px;
+}
+
+.contenedor_carrito table tbody tr #imagen{
+    margin: auto;
+    padding: 0px;
+    width: 100px;
+}
+
+#imagen img{
+    width: 100px;
+    height: 100px;
+}
+
+#scroll-carrito{
+    color: white;
+}
+
+.total_carrito{
+    margin: 20px auto;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    border-radius: 20px;
+}
+
+.btn-carrito a{
+    margin-left: 10px;
+}
+
 /*------------perfil--------------*/
 
 .contenedor_perfil{
@@ -1188,8 +1264,16 @@ h2 {
     color: white;
 }
 
+.contenedor_perfil img{
+    margin: 5px auto;
+    width: 60%;
+    filter: drop-shadow(0px 0px 5px #ffffff);
+    opacity: 0.5;
+}
+
 .contenedor_perfil h3{
     text-align: left;
+    margin-top: 20px;
 }
 
 #scroll-perfil{
@@ -1209,6 +1293,14 @@ h2 {
 
 
 /*---------alertas-----------*/
+
+.alert-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050; /* Asegurarse de que esté sobre otros elementos */
+    max-width: 300px;
+}
 
 #mensaje-centrado {
     position: fixed;

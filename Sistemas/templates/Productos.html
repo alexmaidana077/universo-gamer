@@ -8,15 +8,12 @@
 <div class="{% if message.tags == 'success' %}mensaje-exito{% elif message.tags == 'error' %}mensaje-error{% elif message.tags == 'warning' %}mensaje-advertencia{% elif message.tags == 'info' %}mensaje-info{% endif %}"
     id="mensaje-centrado">
     {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
-    {% if message.tags == 'error' %}<i class="fas fa-times-circle"></i>{% endif %}
-    {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+    {% if message.tags == 'error' %}<i class="fas fa-times-circle"></i>{% endif %} 
     {% if message.tags == 'info' %}<i class="fas fa-info-circle"></i>{% endif %}
     <span>{{ message }}</span>
 </div>
 {% endfor %}
 {% endif %}
-
-
 
 <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -33,18 +30,6 @@
     </ul>
 </div>
 
-{% if productos_stock_bajo %}
-<div class="alert alert-warning" role="alert">
-    <strong>Alerta de stock bajo:</strong>
-    <ul>
-        {% for producto in productos_stock_bajo %}
-        <li>El producto "{{ producto.Nombre }}" tiene solo {{ producto.Cantidad }} unidades en stock.</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-
 <div class="contenedor_visualizar">
     {% for i in products %}
     <div class="card mb-3" id="cardd">
@@ -55,11 +40,11 @@
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title" name="filtro">{{i.Nombre}}</h5>
-
                     <p class="card-text">{{i.MicroDescripcion}}</p>
                     <h6>$ {{i.Precio}}</h6>
                     <div class="button-container">
-                        <a href="#" class="btn btn-outline-info" id="aa">Añadir al carrito</a>
+                        <a href="{% url 'agregar_al_carrito' i.Codigo %}" class="btn btn-outline-info" id="aa">Añadir al
+                            carrito</a>
                         <a href="{% url 'producto' i.Codigo %}" class="btn btn-outline-light">Mas info</a>
                         {% if perms.Sistemas.change_productos %}
                         <a href="{% url 'modificar' i.Codigo %}" class="btn btn-outline-light">Editar</a>

@@ -3,12 +3,12 @@ from django.contrib.auth.models import User
 
 
 # Create your models here.
+
 class Productos (models.Model):
     Codigo=models.AutoField(primary_key=True)
     Nombre=models.TextField(max_length=60)
     Descripcion=models.TextField()
     MicroDescripcion=models.TextField(max_length=200)
-
     Cantidad=models.IntegerField()
     Precio=models.FloatField()
     Imagen=models.ImageField(upload_to="Productos", null=True)

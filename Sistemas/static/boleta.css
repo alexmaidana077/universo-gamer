@@ -1,0 +1,38 @@
+.boleta {
+    width: 70%;
+    margin: auto;
+    text-align: left;
+}
+
+.boleta table{
+    width: 100%;
+}
+
+.boleta table thead tr th{
+    margin-bottom: 20px;
+    border-bottom: #000000 solid 2px;
+}
+
+.boleta table tbody tr td{
+    height: 100px;
+    width: 25%;
+}
+
+.boleta-txt{
+    text-align: right;
+}
+
+.boleta-txt2{
+    text-align: center;
+}
+
+.fecha {
+    display: flex;
+    justify-content: space-between;
+    width: 40%;
+    margin-top: 0px;
+}
+
+.info{
+    width: 100%;
+}

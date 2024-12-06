@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'boleta.css' %}">
+    <title>Boleta de {{ user.username }}</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #2c3e50;
+        }
+
+        .boleta {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 30px;
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin: 5px 0;
+            color: #7f8c8d;
+        }
+
+        .info {
+            border-bottom: 1px solid #dcdcdc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .fecha {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #95a5a6;
+            margin-top: 10px;
+        }
+
+        .fecha p {
+            margin: 0;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead th {
+            background-color: #1abc9c;
+            color: #ffffff;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #16a085;
+        }
+
+        table tbody td {
+            padding: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid #eaeaea;
+            color: #34495e;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .boleta-txt {
+            text-align: right;
+        }
+
+        .boleta-txt2 {
+            text-align: center;
+        }
+
+        /* Highlight Total Row */
+        tbody tr:last-child td {
+            font-weight: bold;
+            background-color: #e8f8f5;
+            color: #27ae60;
+        }
+
+        tbody tr:last-child td.boleta-txt {
+            font-size: 16px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: #1abc9c;
+            font-weight: bold;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .boleta {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .fecha {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background-color: #fff;
+            }
+
+            .boleta {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            table thead th {
+                background-color: #333 !important;
+                color: #fff !important;
+            }
+
+            .footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="boleta">
+
+        <!-- Cliente Information -->
+        <div class="info">
+            <h1>Universo Gamer</h1>
+            <h3>Cliente: {{ user.last_name }} {{ user.first_name }}</h3>
+            <h3>Email: {{ user.email }}</h3>
+            <div class="fecha">
+                <p>Fecha de emisión: {{ fecha_hora|date:"d/m/Y" }}</p>
+                <p>Hora: {{ fecha_hora|date:"H:i:s" }}</p>
+            </div>
+        </div>
+
+        <!-- Productos Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito %}
+                <tr>
+                    <td>{{ item.producto.Nombre }}</td>
+                    <td class="boleta-txt2">{{ item.cantidad }}</td>
+                    <td class="boleta-txt">${{ item.producto.Precio|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2" class="boleta-txt">Total</td>
+                    <td class="boleta-txt">${{ total|floatformat:2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Gracias por tu compra en <a href="#">Universo Gamer</a>. ¡Esperamos verte pronto!</p>
+        </div>
+    </div>
+</body>
+
+</html>

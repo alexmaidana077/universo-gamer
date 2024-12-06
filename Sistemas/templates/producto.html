@@ -8,13 +8,14 @@
     <div class="info">
         <h1>{{i.Nombre}}</h1>
         <h3>${{i.Precio}}</h3>
+        <h3>${{i.Cantidad}}</h3>
         <div class="overflow-auto" style="height: 200px;">
             <p id="scrollspyHeading1">{{i.Descripcion}}</p>
         </div>
 
         <div class="button-container"></div>
             <a href="#" class="btn btn-primary" id="compra">Comprar</a>
-            <a href="#" class="btn btn-outline-info" id="aa">Añadir al carrito</a>
+            <a href="{% url 'agregar_al_carrito' i.Codigo %}" class="btn btn-outline-info" id="aa">Añadir al carrito</a>
         </div>
     </div>
 </div>
